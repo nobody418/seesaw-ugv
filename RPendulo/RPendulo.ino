@@ -1,10 +1,10 @@
 /***
-   Intento de ajustar inercia de los motores
+   Probando sensor inferior
 */
 #include <Arduino.h>    //Incluye librerias para arduino
 #include <Wire.h>       //Incluye libreria para I2C
 
-#define MPU 0x69        //Direccion I2C de la IMU
+#define MPU 0x68        //Direccion I2C de la IMU
 //MPU-6050 da los valores en enteros de 16 bits
 //Valores RAW
 int16_t AcX, AcY = 0, AcZ, AcY1;
@@ -26,9 +26,9 @@ float e[3], u, a1, a2, a3;
 int v = 0;
 
 //Constantes de control
-float kp = 2;
+float kp = 1.8;
 float kd = 0;
-float ki = 5.8;
+float ki = 23;
 
 //Variables para control de tiempo
 unsigned long t0 = 0;
@@ -64,7 +64,7 @@ void loop() {
   leeMPU();
   e[2] = e[1];
   e[1] = e[0];
-  e[0] = 20 - 1.26*float(AcY / 164) - 0.41*float(GyX / 131);
+  e[0] = 10 - float(AcY / 164) - 0.75*float(GyX / 131);
 
   a1 = kp + 0.5 * ki * dt;
   a2 = 0.5 * ki * dt;
@@ -128,8 +128,8 @@ void leeMPU() {
   Wire.write(0x3B); //Pedir el registro 0x3B - corresponde al AcX
   Wire.endTransmission(false);
   Wire.requestFrom(MPU, 6, true); //A partir del 0x3B, se piden 6 registros
-  AcX = Wire.read() << 8 | Wire.read(); //Cada valor ocupa 2 registros
-  AcY1 = Wire.read() << 8 | Wire.read();
+  AcY1 = Wire.read() << 8 | Wire.read(); //Cada valor ocupa 2 registros
+  AcX = Wire.read() << 8 | Wire.read();
   AcZ = Wire.read() << 8 | Wire.read();
 
   AcY = floor(0.7 * float(AcY) + 0.3 * float(AcY1));
@@ -139,8 +139,8 @@ void leeMPU() {
   Wire.write(0x43);
   Wire.endTransmission(false);
   Wire.requestFrom(MPU, 6, true); //A partir del 0x43, se piden 6 registros
-  GyX = Wire.read() << 8 | Wire.read(); //Cada valor ocupa 2 registros
-  GyY = Wire.read() << 8 | Wire.read();
+  GyY = Wire.read() << 8 | Wire.read(); //Cada valor ocupa 2 registros
+  GyX = Wire.read() << 8 | Wire.read();
   GyZ = Wire.read() << 8 | Wire.read();
 
 }
