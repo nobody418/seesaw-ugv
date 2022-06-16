@@ -1,18 +1,16 @@
+/***
+   Intento de ajustar inercia de los motores
+*/
 #include <Arduino.h>    //Incluye librerias para arduino
 #include <Wire.h>       //Incluye libreria para I2C
 
 #define MPU 0x69        //Direccion I2C de la IMU
-//Radios de conversion
-#define A_R 16384.0 // 32768/2
-#define G_R 131.0 // 32768/250
-//Conversion de radianes a grados 180/PI
-#define RAD_A_DEG = 57.295779
 //MPU-6050 da los valores en enteros de 16 bits
 //Valores RAW
-int16_t AcX, AcY, AcZ;
+int16_t AcX, AcY = 0, AcZ, AcY1;
+int16_t GyX, GyY, GyZ;
 //Angulos
-float Acc[2];
-String valores;
+float dt;
 
 
 //DEFINE PINES DRIVER de MOTORES L298N
@@ -23,7 +21,17 @@ String valores;
 #define PWML 14  //=D5   //ENA
 #define PWMR 12  //=D6   //ENB
 
+//Variable para el ancho de PWM de los motores
+float e[3], u, a1, a2, a3;
 int v = 0;
+
+//Constantes de control
+float kp = 2;
+float kd = 0;
+float ki = 5.8;
+
+//Variables para control de tiempo
+unsigned long t0 = 0;
 
 void setup() {
   pinMode(LM1, OUTPUT);
@@ -39,34 +47,51 @@ void setup() {
   Wire.write(0);
   Wire.endTransmission(true);
 
+  e[0] = 0;
+  e[1] = 0;
+  e[2] = 0;
+  u = 0;
+
+  mov(0);
+  motorStop();
+
   Serial.begin(9600);
 }
 
 void loop() {
-  //Serial.println(estado);
-  delay(400);
+  dt = float(millis() - t0) / 1000;
+  t0 = millis();
   leeMPU();
+  e[2] = e[1];
+  e[1] = e[0];
+  e[0] = 20 - 1.26*float(AcY / 164) - 0.41*float(GyX / 131);
 
-//  mov(v);
-//  
-//  v += 90;
-//  if (v >= 255) {
-//    v = -255;
-//  }
+  a1 = kp + 0.5 * ki * dt;
+  a2 = 0.5 * ki * dt;
+  a3 = 0;
+
+  u = a1 * e[0] + a2 * e[1] + a3 * e[2];
+  v = floor(u);
+
+  Serial.println(String(v) + " , " + String(e[0]));
+  mov(v);
+  delay(10);
 }
 
+
 void mov(int v) { //Movimiento del robot
-  velMot(abs(v));
-  if (v > 255) {
-    v = 255;
+  if (v > 125) {
+    v = 125;
   }
-  if (v < -255) {
-    v = -255;
+  if (v < -125) {
+    v = -125;
   }
-  if (v >= 0) {
+  if (v > 0) {
     motorFW();
+    velMot(abs(140 + v));
   } else {
     motorBW();
+    velMot(abs(-140 + v));
   }
 }
 
@@ -104,20 +129,18 @@ void leeMPU() {
   Wire.endTransmission(false);
   Wire.requestFrom(MPU, 6, true); //A partir del 0x3B, se piden 6 registros
   AcX = Wire.read() << 8 | Wire.read(); //Cada valor ocupa 2 registros
-  AcY = Wire.read() << 8 | Wire.read();
+  AcY1 = Wire.read() << 8 | Wire.read();
   AcZ = Wire.read() << 8 | Wire.read();
 
-  //Calculo de los angulos Y, X respectivamente, con la formula de la tangente.
-  //Acc2[1] = atan(-1*(AcX2/A_R2)/sqrt(pow((AcY2/A_R2),2) + pow((AcZ2/A_R2),2)))*RAD_TO_DEG;
-  //Acc2[0] = atan((AcY2/A_R2)/sqrt(pow((AcX2/A_R2),2) + pow((AcZ2/A_R2),2)))*RAD_TO_DEG;
+  AcY = floor(0.7 * float(AcY) + 0.3 * float(AcY1));
 
-  Acc[0] = atan((AcY) / sqrt(pow((AcX), 2) + pow((AcZ), 2)));
+  //Leer los valores del Giroscopio
+  Wire.beginTransmission(MPU);
+  Wire.write(0x43);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU, 6, true); //A partir del 0x43, se piden 6 registros
+  GyX = Wire.read() << 8 | Wire.read(); //Cada valor ocupa 2 registros
+  GyY = Wire.read() << 8 | Wire.read();
+  GyZ = Wire.read() << 8 | Wire.read();
 
-
-  valores = "90, " + String(Acc[0]) + "," ;
-  Serial.println("x="+String(AcX)+", y="+String(AcY)+", z="+String(AcZ));
-  Serial.println("Angulos MPU");
-  Serial.println(valores);
-
-  delay(10);
 }
