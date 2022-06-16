@@ -9,9 +9,6 @@
 //Valores RAW
 int16_t AcX, AcY = 0, AcZ, AcY1;
 int16_t GyX, GyY, GyZ;
-//Angulos
-float dt;
-
 
 //DEFINE PINES DRIVER de MOTORES L298N
 #define LM1 0    //=D3   //IN1
@@ -32,6 +29,7 @@ float ki = 5.8;
 
 //Variables para control de tiempo
 unsigned long t0 = 0;
+float dt;
 
 void setup() {
   pinMode(LM1, OUTPUT);
@@ -64,7 +62,7 @@ void loop() {
   leeMPU();
   e[2] = e[1];
   e[1] = e[0];
-  e[0] = 20 - 1.26*float(AcY / 164) - 0.41*float(GyX / 131);
+  e[0] = 20 - 1.26 * float(AcY / 164) - 0.41 * float(GyX / 131);
 
   a1 = kp + 0.5 * ki * dt;
   a2 = 0.5 * ki * dt;
