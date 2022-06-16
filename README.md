@@ -2,7 +2,13 @@
 Robot péndulo invertido en configuración diferencial, con ESP8266
 
 ## Esquema Mecánico del robot
-![](Esquema_Fisico.jpeg){width='400px'}
+<div>
+    <p style = 'text-align:center;'>
+        <img src="Esquema_Fisico.jpeg" width="400px">
+    </p>
+</div>
+
+El esquema muestra la disposición mecánica del robot, junto con los ejes que maneja el sensor MPU. En esta configuración el robot tiene el eje longitudinal en el Eje Y del sensor y el eje transversal en el Eje X.
 
 ## Versión Actual 1.9
 En esta versión se realizaron los siguientes cambios:
