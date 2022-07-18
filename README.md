@@ -1,5 +1,5 @@
 # seesaw-ugv
-Robot péndulo invertido en configuración diferencial, con ESP8266
+Robot péndulo invertido en configuración diferencial, con Arduino NANO
 
 ## Esquema Mecánico del robot
 <div>
@@ -10,7 +10,14 @@ Robot péndulo invertido en configuración diferencial, con ESP8266
 
 El esquema muestra la disposición mecánica del robot, junto con los ejes que maneja el sensor MPU. En esta configuración el robot tiene el eje longitudinal en el Eje Y del sensor y el eje transversal en el Eje X.
 
-## Versión Actual 1.9
+## Versión Actual 2.0
+En esta nueva versión se decidió por cambiar el microcontrolador por un Arduino Nano, y se incluyeron las siguientes librerías:
+- Arduino-PID-Library
+- LMotorController
+- I2Cdev
+- MPU6050
+
+## Versión 1.9
 En esta versión se realizaron los siguientes cambios:
 1. Se utiliza el valor que obtiene el giroscopio de la velocidad angular para mejorar la precisión de la señal de error que controla el robot.
 2. Tambien se utiliza una nueva función para mejorar la operación de los motores dentro de los rangos útiles del PWM, tanto para avanzar como para retroceder.
