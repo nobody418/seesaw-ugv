@@ -42,11 +42,11 @@ double Kd = 2.6;
 double Ki = 250;
 
 //Factor de 0 a 100% de activacion del PWM, sirve para corregir cuando un motor esta "lento"
-double motorSpeedFactorLeft = 0.51;//0.46; //double motorSpeedFactorLeft = 0.5;
+double motorSpeedFactorLeft = 0.53;//0.46; //double motorSpeedFactorLeft = 0.5;
 double motorSpeedFactorRight = 0.45;//0.40; //double motorSpeedFactorRight = 0.45;
 
 //Set point buscado
-double originalSetpoint = 179.2;   //double originalSetpoint = 172.50;
+double originalSetpoint = 178.5;   //double originalSetpoint = 172.50;
 double setpoint = originalSetpoint;
 double input, output;
 
@@ -115,7 +115,7 @@ void setup() {
 
 void loop() {
   tiempoInicial = micros();
-  
+
   // if programming failed, don't try to do anything
   if (!dmpReady) return;
 
@@ -156,10 +156,16 @@ void loop() {
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
     input = ypr[1] * 57.2958 + 180;    //180/M_pi = 180/3.1415
 
-    if (abs(setpoint - input) < 5) {
+    double error = setpoint - input;
+
+    if (abs(error) < 2) {
       Kp = 10;
-      Ki = 0;
-      Kd = 1.23;
+      Ki = 50;
+      Kd = 1.89;
+    } else if (abs(error) < 4) {
+      Kp = 55.4;
+      Ki = 107;
+      Kd = 1;
     } else {
       Kp = 62;
       Ki = 255;
