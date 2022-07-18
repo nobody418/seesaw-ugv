@@ -18,7 +18,7 @@ En esta versión se realizaron los siguientes cambios:
     - Banda 2: (-4, -2] y [2, 4)
     - Banda 3: error <= -4, error >= 4
 
-## Versión Actual 2.0
+## Versión 2.0
 En esta nueva versión se decidió por cambiar el microcontrolador por un Arduino Nano, y se incluyeron las siguientes librerías:
 - Arduino-PID-Library
 - LMotorController
