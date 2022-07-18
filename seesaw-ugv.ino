@@ -48,7 +48,6 @@ double motorSpeedFactorRight = 0.45;//0.40; //double motorSpeedFactorRight = 0.4
 //Set point buscado
 double originalSetpoint = 179.2;   //double originalSetpoint = 172.50;
 double setpoint = originalSetpoint;
-double movingAngleOffset = 0.1;
 double input, output;
 
 PID pid(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT);
@@ -116,7 +115,7 @@ void setup() {
 
 void loop() {
   tiempoInicial = micros();
-  //Serial.print(F("Loop principal"));
+  
   // if programming failed, don't try to do anything
   if (!dmpReady) return;
 
@@ -156,6 +155,16 @@ void loop() {
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
     input = ypr[1] * 57.2958 + 180;    //180/M_pi = 180/3.1415
+
+    if (abs(setpoint - input) < 5) {
+      Kp = 10;
+      Ki = 0;
+      Kd = 1.23;
+    } else {
+      Kp = 62;
+      Ki = 255;
+      Kd = 2.6;
+    }
 
     pid.SetTunings(Kp, Ki, Kd);
 
