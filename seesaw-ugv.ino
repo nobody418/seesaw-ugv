@@ -11,17 +11,17 @@
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
 #include "Wire.h"
 #endif
-#define MIN_ABS_SPEED 30
+#define MIN_ABS_SPEED 20
 MPU6050 mpu;
 
 
 //**** Control de Motores puente H - L298N
-int ENA = 5;    //5;
+int ENA = 3;    //5;
 int IN1 = 7;    //6;
 int IN2 = 8;    //7;
 int IN3 = 9;    //9;
 int IN4 = 10;   //8;
-int ENB = 6;    //10;
+int ENB = 11;    //10;
 
 //**** MPU control/status variables
 bool dmpReady = false; // set true if DMP init was successful
@@ -42,11 +42,11 @@ double Kd = 2.6;
 double Ki = 250;
 
 //Factor de 0 a 100% de activacion del PWM, sirve para corregir cuando un motor esta "lento"
-double motorSpeedFactorLeft = 0.53;//0.46; //double motorSpeedFactorLeft = 0.5;
-double motorSpeedFactorRight = 0.45;//0.40; //double motorSpeedFactorRight = 0.45;
+double motorSpeedFactorLeft = 0.81;//0.46; //double motorSpeedFactorLeft = 0.5;
+double motorSpeedFactorRight = 0.8;//0.40; //double motorSpeedFactorRight = 0.45;
 
 //Set point buscado
-double originalSetpoint = 178.5;   //double originalSetpoint = 172.50;
+double originalSetpoint = 178.8;   //double originalSetpoint = 172.50;
 double setpoint = originalSetpoint;
 double input, output;
 
@@ -68,6 +68,7 @@ unsigned long tiempoFinal = 0;
 
 
 void setup() {
+  TCCR2B = 1;
   delay(500);
   Serial.begin(115200); // inicia el puerto serial para comunicacion //115200//250000
   //Serial_2.begin(9600);
@@ -159,11 +160,11 @@ void loop() {
     double error = setpoint - input;
 
     if (abs(error) < 2) {
-      Kp = 10;
-      Ki = 50;
-      Kd = 1.89;
+      Kp = 35;
+      Ki = 31;
+      Kd = 2.19;
     } else if (abs(error) < 4) {
-      Kp = 55.4;
+      Kp = 45;
       Ki = 107;
       Kd = 1;
     } else {
