@@ -46,9 +46,10 @@ double motorSpeedFactorLeft = 0.81;//0.46; //double motorSpeedFactorLeft = 0.5;
 double motorSpeedFactorRight = 0.8;//0.40; //double motorSpeedFactorRight = 0.45;
 
 //Set point buscado
-double originalSetpoint = 178.8;   //double originalSetpoint = 172.50;
+double originalSetpoint = 181.5;   //double originalSetpoint = 172.50;
 double setpoint = originalSetpoint;
 double input, output;
+
 
 PID pid(&input, &output, &setpoint, Kp, Ki, Kd, DIRECT);
 
@@ -124,6 +125,7 @@ void loop() {
   while (!mpuInterrupt && fifoCount < packetSize) {
     //no mpu data - performing PID calculations and output to motors
     pid.Compute();
+
     motorController.move(output, MIN_ABS_SPEED);
     //Serial.println(output);
   }
@@ -159,18 +161,23 @@ void loop() {
 
     double error = setpoint - input;
 
-    if (abs(error) < 2) {
-      Kp = 35;
-      Ki = 31;
-      Kd = 2.19;
-    } else if (abs(error) < 4) {
+    // Adaptative Gain Scheduling PID
+    if (abs(error) < 1) {
+      Kp = 15;
+      Ki = 10;
+      Kd = 2.5;
+    } else if (abs(error) < 2) {
       Kp = 45;
-      Ki = 107;
-      Kd = 1;
+      Ki = 250;
+      Kd = 2.1;
+    } else if (abs(error) < 3) {
+      Kp = 65;
+      Ki = 240;
+      Kd = 0.3;
     } else {
-      Kp = 62;
+      Kp = 85;
       Ki = 255;
-      Kd = 2.6;
+      Kd = 1.6;
     }
 
     pid.SetTunings(Kp, Ki, Kd);
