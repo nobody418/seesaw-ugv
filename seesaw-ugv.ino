@@ -163,18 +163,22 @@ void loop() {
 
     // Adaptative Gain Scheduling PID
     if (abs(error) < 1) {
-      Kp = 15;
-      Ki = 10;
-      Kd = 2.5;
-    } else if (abs(error) < 2) {
-      Kp = 45;
-      Ki = 250;
+      Kp = 35;
+      Ki = 31;
       Kd = 2.1;
+    } else if (abs(error) < 2) {
+      Kp = 37.5;
+      Ki = 250;
+      Kd = 1.7;
     } else if (abs(error) < 3) {
-      Kp = 65;
+      Kp = 40;
       Ki = 240;
       Kd = 0.3;
-    } else {
+    } else if (abs(error) < 4) {
+      Kp = 55;
+      Ki = 250;
+      Kd = 1.3;
+    } else    {
       Kp = 85;
       Ki = 255;
       Kd = 1.6;
