@@ -1,0 +1,20 @@
+#######################################
+# Syntax Coloring Map For MotorController Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+LMotorController	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+move	KEYWORD2
+turnLeft	KEYWORD2
+turnRight	KEYWORD2
+SetTunings	KEYWORD2
+stopMoving	KEYWORD2
+
