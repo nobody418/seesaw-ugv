@@ -11,7 +11,7 @@
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
 #include "Wire.h"
 #endif
-#define MIN_ABS_SPEED 20
+#define MIN_ABS_SPEED 10
 MPU6050 mpu;
 
 
@@ -42,11 +42,11 @@ double Kd = 2.6;
 double Ki = 250;
 
 //Factor de 0 a 100% de activacion del PWM, sirve para corregir cuando un motor esta "lento"
-double motorSpeedFactorLeft = 0.81;//0.46; //double motorSpeedFactorLeft = 0.5;
-double motorSpeedFactorRight = 0.8;//0.40; //double motorSpeedFactorRight = 0.45;
+double motorSpeedFactorLeft = 0.85;//0.46; //double motorSpeedFactorLeft = 0.5;
+double motorSpeedFactorRight = 0.84;//0.40; //double motorSpeedFactorRight = 0.45;
 
 //Set point buscado
-double originalSetpoint = 181.5;   //double originalSetpoint = 172.50;
+double originalSetpoint = 182.5;   //double originalSetpoint = 172.50;
 double setpoint = originalSetpoint;
 double input, output;
 
@@ -127,7 +127,6 @@ void loop() {
     pid.Compute();
 
     motorController.move(output, MIN_ABS_SPEED);
-    //Serial.println(output);
   }
 
   //reset interrupt flag and get INT_STATUS byte
@@ -162,25 +161,25 @@ void loop() {
     double error = setpoint - input;
 
     // Adaptative Gain Scheduling PID
-    if (abs(error) < 1) {
-      Kp = 35;
-      Ki = 31;
-      Kd = 2.1;
-    } else if (abs(error) < 2) {
-      Kp = 37.5;
-      Ki = 250;
-      Kd = 1.7;
+    if (abs(error) < 2) {
+      Kp = 31.66;
+      Ki = 100;
+      Kd = 3.1;
     } else if (abs(error) < 3) {
-      Kp = 40;
-      Ki = 240;
-      Kd = 0.3;
+      Kp = 45;
+      Ki = 200;
+      Kd = 1.7;
+    } else if (abs(error) < 3.5) {
+      Kp = 35;
+      Ki = 300;
+      Kd = 2.3;
     } else if (abs(error) < 4) {
-      Kp = 55;
-      Ki = 250;
-      Kd = 1.3;
-    } else    {
-      Kp = 85;
-      Ki = 255;
+      Kp = 40;
+      Ki = 400;
+      Kd = 2.4;
+    } else {
+      Kp = 50;
+      Ki = 500;
       Kd = 1.6;
     }
 
